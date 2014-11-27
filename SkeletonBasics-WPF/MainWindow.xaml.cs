@@ -35,12 +35,12 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         /// <summary>
         /// Fase en que se encuentran los movimientos.
         /// </summary>
-        private int fase=0;
+        private int fase = 0;
 
         /// <summary>
         /// Tolerancia a errores. Esta variable sera leida por pantalla con ayuda de un deslizador.
         /// </summary>
-        
+
         private double tolerancia = 0.1f;
         /// <summary>
         /// Height of our output drawing
@@ -163,7 +163,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             // Create an image source that we can use in our image control
             this.imageSource = new DrawingImage(this.drawingGroup);
 
-            
+
 
             // Look through all sensors and start the first connected one.
             // This requires that a Kinect is connected at the time of app startup.
@@ -184,7 +184,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                 this.Esqueleto.Source = this.imageSource;
                 // Turn on the skeleton stream to receive skeleton frames
                 this.sensor.SkeletonStream.Enable();
-                
+
                 // Add an event handler to be called whenever there is new color frame data
                 this.sensor.SkeletonFrameReady += this.SensorSkeletonFrameReady;
                 // Turn on the color stream to receive color frames
@@ -213,7 +213,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                 }
             }
 
-           
+
         }
 
         /// <summary>
@@ -303,7 +303,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                 this.drawingGroup.ClipGeometry = new RectangleGeometry(new Rect(0.0, 0.0, RenderWidth, RenderHeight));
             }
         }
-        
+
         /// <summary>
         /// Draws a skeleton's bones and joints
         /// </summary>
@@ -329,7 +329,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             this.DrawBone(skeleton, drawingContext, JointType.ShoulderRight, JointType.ElbowRight);
             this.DrawBone(skeleton, drawingContext, JointType.ElbowRight, JointType.WristRight);
             this.DrawBone(skeleton, drawingContext, JointType.WristRight, JointType.HandRight);
-          
+
             // Left Leg
             this.DrawBone(skeleton, drawingContext, JointType.HipLeft, JointType.KneeLeft);
             this.DrawBone(skeleton, drawingContext, JointType.KneeLeft, JointType.AnkleLeft);
@@ -343,15 +343,15 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             // Render Joints
             foreach (Joint joint in skeleton.Joints)
             {
-                Brush drawBrush = null; 
+                Brush drawBrush = null;
 
                 if (joint.TrackingState == JointTrackingState.Tracked)
                 {
-                    drawBrush = this.trackedJointBrush;                    
+                    drawBrush = this.trackedJointBrush;
                 }
                 else if (joint.TrackingState == JointTrackingState.Inferred)
                 {
-                    drawBrush = this.inferredJointBrush;                    
+                    drawBrush = this.inferredJointBrush;
                 }
 
                 if (drawBrush != null)
@@ -384,7 +384,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         private void TolSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             // Modificamos la tolerancia aceptada por el objeto de control. Para ello usamos el valor del slider.
-            this.tolerancia=((double)TolSlider.Value);
+            this.tolerancia = ((double)TolSlider.Value);
         }
 
         /// <summary>
@@ -393,16 +393,16 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         /// <param name="esqueleto"></param>
 
         public void CompruebaMovimientos(Skeleton esqueleto)
-
         {
             this.FeedbackTexBlock.Text = "\t Informacion de los ejercicios";
+            this.FeedbackTexBlock.Text = "\t Coloque las manos en cruz";
             if (this.fase == 0)
             {
                 brazosEnCruz(esqueleto);
 
             }
-            if (this.fase == 1) 
-            { 
+            if (this.fase == 1)
+            {
                 HandsOnHead(esqueleto);
             }
 
@@ -431,7 +431,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             {
                 return;
             }
-            
+
             // Don't draw if both points are inferred
             if (joint0.TrackingState == JointTrackingState.Inferred &&
                 joint1.TrackingState == JointTrackingState.Inferred)
@@ -448,7 +448,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
             drawingContext.DrawLine(drawPen, this.SkeletonPointToScreen(joint0.Position), this.SkeletonPointToScreen(joint1.Position));
         }
-        
+
         /// <summary>
         /// Metodo que comprueba si los brazos estan en cruz
         /// </summary>
@@ -464,23 +464,24 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             Joint wristI = esqueleto.Joints[JointType.WristLeft];
             Joint shoulderI = esqueleto.Joints[JointType.ShoulderLeft];
             Joint bowI = esqueleto.Joints[JointType.ElbowLeft];
-
+            this.FeedbackTexBlock.Text = "\t Coloque las manos en cruz";
             if (Math.Abs(wristD.Position.Y - shoulderD.Position.Y) < this.tolerancia/*0.05f*/ && Math.Abs(wristD.Position.Y - shoulderD.Position.Y) > 0 && Math.Abs(wristI.Position.Y - shoulderI.Position.Y) < 0.05f && Math.Abs(wristI.Position.Y - shoulderI.Position.Y) > 0)
             {
 
                 this.fase = 1;
                 enPosicion = true;
                 this.FeedbackTexBlock.Text = "\tBien hecho. Ahora el siguiente movimiento";
+                this.FeedbackTexBlock.Text = "\t ponga las manos en la cabeza";
             }
             else
             {
                 fase = 0;
                 enPosicion = false;
-                this.FeedbackTexBlock.Text = "\t Mal, intentelo de nuevo.";
+
             }
             return enPosicion;
         }
-            
+
         /// <summary>
         /// Metodo que comprueba si las manos estan en la cabeza. Para eso comprueba la 
         /// distancia de ambas manos entre la cabeza.
@@ -496,12 +497,12 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             bool enPosicion = false;
             float distanceIq = (manoIq.Position.X - cab.Position.X) + (manoIq.Position.Y - cab.Position.Y) + (manoIq.Position.Z - cab.Position.Z);
             float distanceDr = (manoDr.Position.X - cab.Position.X) + (manoDr.Position.Y - cab.Position.Y) + (manoDr.Position.Z - cab.Position.Z);
-            
+
             // dependiendo de la distancia el resultado sera true o false.
             if (Math.Abs(distanceIq) < 0.2f && Math.Abs(distanceDr) < this.tolerancia /*0.2f*/)
             {
-                
-                enPosicion= true ;
+
+                enPosicion = true;
                 this.fase = 2;
             }
             else
@@ -529,7 +530,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             Joint ElBowD = esqueleto.Joints[JointType.ElbowRight];
             Joint WristD = esqueleto.Joints[JointType.WristRight];
             bool enPosicion = false;
-            
+
             // comprobamos que las manos estan mirando hacia abajo.
             if (Math.Abs(ShoulderD.Position.X - WristD.Position.X) < this.tolerancia/*0.1f*/ && Math.Abs(ShoulderD.Position.X - WristD.Position.X) > 0 && Math.Abs(ShoulderD.Position.X - ElBowD.Position.X) < this.tolerancia/*0.1f*/ && Math.Abs(ShoulderD.Position.X - ElBowD.Position.X) > 0)
             {
@@ -539,7 +540,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             }
             else
             {
-                this.FeedbackTexBlock.Text="\t Mal. Baje las manos.";
+                this.FeedbackTexBlock.Text = "\t Mal. Baje las manos.";
                 enPosicion = false;
                 this.fase = 2;
             }
