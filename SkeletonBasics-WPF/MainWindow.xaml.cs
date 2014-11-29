@@ -497,7 +497,6 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             }
             else
             {
-                fase = 0;
                 enPosicion = false;
              
             }
@@ -531,7 +530,6 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             {
                 this.FeedbackTexBlock.Text = "\t No tiene las manos en la cabeza.";
                 enPosicion = false;
-                this.fase = 1;
             }
             return enPosicion;
         }
@@ -567,7 +565,6 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             {    
                 this.FeedbackTexBlock.Text="\t Mal. Baje las manos.";
                 enPosicion = false;
-                this.fase = 2;
             }
             return enPosicion;
         }
