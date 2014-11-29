@@ -1,7 +1,7 @@
 ﻿<Window x:Class="Microsoft.Samples.Kinect.SkeletonBasics.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Skeleton Basics" Height="735" Width="770" Loaded="WindowLoaded" Closing="WindowClosing">
+        Title="Skeleton Basics" Height="809" Width="770" Loaded="WindowLoaded" Closing="WindowClosing">
 
     <Window.Resources>
         <SolidColorBrush x:Key="MediumGreyBrush" Color="#ff6e6e6e"/>
@@ -56,27 +56,30 @@
         <DockPanel Grid.Row="0" Margin="0 0 0 20">
             <Image DockPanel.Dock="Left" Source="Images\Logo.png" Stretch="Fill" Height="32" Width="81" Margin="0 10 0 5"/>
             <TextBlock DockPanel.Dock="Right" Margin="0 0 -1 0" VerticalAlignment="Bottom" Foreground="{StaticResource MediumGreyBrush}" FontFamily="Segoe UI" FontSize="18">Pr2_NPI</TextBlock>
-            <Image Grid.Column="1" Source="Images\Status.png" Stretch="None" HorizontalAlignment="Center" Margin="0 0 0 5"/>
+            <Image Grid.Column="1" Source="Images\Status.png" Stretch="None" HorizontalAlignment="Center" Margin="0 0 0 0"/>
         </DockPanel>
-        <Viewbox Grid.Row="1" Stretch="Uniform" HorizontalAlignment="Center">
+        <Viewbox Stretch="Uniform" HorizontalAlignment="Center" Margin="0,0,0,0" Grid.RowSpan="2">
             <Image Name="ColorI" Width="640" Height="480"/>
         </Viewbox>
-        <Viewbox Grid.Row="1" Stretch="Uniform" HorizontalAlignment="Center">
+        <Viewbox Stretch="Uniform" HorizontalAlignment="Center" Margin="0,0,0,0" Grid.RowSpan="2">
             <Image Name="Esqueleto" Width="640" Height="480"/>
         </Viewbox>
-        <StatusBar Grid.Row="3" HorizontalAlignment="Stretch" Name="statusBar" VerticalAlignment="Bottom" Background="White" Foreground="{StaticResource MediumGreyBrush}">
-            <StatusBarItem Padding="0 0 0 10">
-                <TextBlock Name="FeedbackTexBlock" Margin="-1 0 0 0">Informacion</TextBlock>
+        <StatusBar Grid.Row="3" HorizontalAlignment="Right"  Name="statusBar" VerticalAlignment="Bottom" Background="White" Foreground="{StaticResource MediumGreyBrush}" Height="28">
+            <StatusBarItem>
+                <TextBlock Name="AlteToleracia" Margin="0,0,0,0" Grid.Row="3">Tolerancia</TextBlock>
+            </StatusBarItem>
+            <StatusBarItem>
+                    <Slider Grid.Row="1" Height="15" HorizontalAlignment="Right" Maximum="0.50" Minimum="0.00" Margin="0,0,0,0" Name="TolSlider" VerticalAlignment="Top" Width="75" ValueChanged="TolSlider_ValueChanged" Grid.RowSpan="3" />
             </StatusBarItem>
         </StatusBar>
-        <StatusBar Grid.Row="3" HorizontalAlignment="Center" Name="statusBar2" VerticalAlignment="Bottom" Background="White" Foreground="{StaticResource MediumGreyBrush}">
-            <StatusBarItem Padding="0 0 0 10">
-                <TextBlock Name="AlteToleracia" Margin="-1 0 0 0">Tolerancia</TextBlock>
-                </StatusBarItem>
+        <StatusBar Grid.Row="4" HorizontalAlignment="left"  Name="statusBar1" VerticalAlignment="Bottom" Background="White" Foreground="{StaticResource MediumGreyBrush}" Height="50">
+            <StatusBarItem VerticalAlignment="Top" HorizontalAlignment="left">
+                <TextBlock Name="FeedbackRepes" Margin="0,0,0,0" Grid.Row="3">Repeticiones</TextBlock>
+            </StatusBarItem>
+            <StatusBarItem VerticalAlignment="Bottom" HorizontalAlignment="left">
+                <TextBlock Name="FeedbackTexBlock" Margin="0,0,0,0" Grid.Row="3">Informacion</TextBlock>
+            </StatusBarItem>
         </StatusBar>
-        <StatusBar Grid.Row="3" HorizontalAlignment="Right" Name="statusBar3" VerticalAlignment="Bottom" Background="White" Foreground="{StaticResource MediumGreyBrush}">
-            <StatusBarItem Padding="0 0 0 10"></StatusBarItem>
-        </StatusBar>
-        <Slider Grid.Row="1" Height="23" HorizontalAlignment="Left" Maximum="0.50" Minimum="0.00" Margin="411,596,0,0" Name="TolSlider" VerticalAlignment="Top" Width="75" ValueChanged="TolSlider_ValueChanged" Grid.RowSpan="3" />
+       
     </Grid>
 </Window>

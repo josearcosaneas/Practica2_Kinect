@@ -32,15 +32,23 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         /// </summary>
         private byte[] colorPixels;
 
+
+        /// <summary>
+        /// Variable que lleva el numero de variaciones.
+        /// </summary>
+        private int repeticiones = 0;
+
+
+
         /// <summary>
         /// Fase en que se encuentran los movimientos.
         /// </summary>
-        private int fase = 0;
+        private int fase=0;
 
         /// <summary>
         /// Tolerancia a errores. Esta variable sera leida por pantalla con ayuda de un deslizador.
         /// </summary>
-
+        
         private double tolerancia = 0.1f;
         /// <summary>
         /// Height of our output drawing
@@ -163,7 +171,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             // Create an image source that we can use in our image control
             this.imageSource = new DrawingImage(this.drawingGroup);
 
-
+            
 
             // Look through all sensors and start the first connected one.
             // This requires that a Kinect is connected at the time of app startup.
@@ -184,7 +192,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                 this.Esqueleto.Source = this.imageSource;
                 // Turn on the skeleton stream to receive skeleton frames
                 this.sensor.SkeletonStream.Enable();
-
+                
                 // Add an event handler to be called whenever there is new color frame data
                 this.sensor.SkeletonFrameReady += this.SensorSkeletonFrameReady;
                 // Turn on the color stream to receive color frames
@@ -213,7 +221,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                 }
             }
 
-
+           
         }
 
         /// <summary>
@@ -303,7 +311,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                 this.drawingGroup.ClipGeometry = new RectangleGeometry(new Rect(0.0, 0.0, RenderWidth, RenderHeight));
             }
         }
-
+        
         /// <summary>
         /// Draws a skeleton's bones and joints
         /// </summary>
@@ -329,7 +337,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             this.DrawBone(skeleton, drawingContext, JointType.ShoulderRight, JointType.ElbowRight);
             this.DrawBone(skeleton, drawingContext, JointType.ElbowRight, JointType.WristRight);
             this.DrawBone(skeleton, drawingContext, JointType.WristRight, JointType.HandRight);
-
+          
             // Left Leg
             this.DrawBone(skeleton, drawingContext, JointType.HipLeft, JointType.KneeLeft);
             this.DrawBone(skeleton, drawingContext, JointType.KneeLeft, JointType.AnkleLeft);
@@ -339,19 +347,24 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             this.DrawBone(skeleton, drawingContext, JointType.HipRight, JointType.KneeRight);
             this.DrawBone(skeleton, drawingContext, JointType.KneeRight, JointType.AnkleRight);
             this.DrawBone(skeleton, drawingContext, JointType.AnkleRight, JointType.FootRight);
+
+            // comprueba los movimientos y dibuja la ayuda 
+            // LA ayuda no me funciona y no ha sido probada.
+            dibujarAyuda(skeleton,drawingContext);
+
             CompruebaMovimientos(skeleton);
             // Render Joints
             foreach (Joint joint in skeleton.Joints)
             {
-                Brush drawBrush = null;
+                Brush drawBrush = null; 
 
                 if (joint.TrackingState == JointTrackingState.Tracked)
                 {
-                    drawBrush = this.trackedJointBrush;
+                    drawBrush = this.trackedJointBrush;                    
                 }
                 else if (joint.TrackingState == JointTrackingState.Inferred)
                 {
-                    drawBrush = this.inferredJointBrush;
+                    drawBrush = this.inferredJointBrush;                    
                 }
 
                 if (drawBrush != null)
@@ -384,7 +397,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         private void TolSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             // Modificamos la tolerancia aceptada por el objeto de control. Para ello usamos el valor del slider.
-            this.tolerancia = ((double)TolSlider.Value);
+            this.tolerancia=((double)TolSlider.Value);
         }
 
         /// <summary>
@@ -393,24 +406,33 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         /// <param name="esqueleto"></param>
 
         public void CompruebaMovimientos(Skeleton esqueleto)
-        {
+
+        {    
             this.FeedbackTexBlock.Text = "\t Informacion de los ejercicios";
-            this.FeedbackTexBlock.Text = "\t Coloque las manos en cruz";
+            
             if (this.fase == 0)
             {
+                this.FeedbackTexBlock.Text = "\t Coloque las manos en cruz";
                 brazosEnCruz(esqueleto);
 
             }
-            if (this.fase == 1)
+            if (this.fase == 1) 
             {
+                this.FeedbackTexBlock.Text = "\t Coloque las manos en la cabeza";
                 HandsOnHead(esqueleto);
             }
 
             if (this.fase == 2)
             {
+                this.FeedbackTexBlock.Text = "\t Coloque las manos hacia abajo ";
                 manoAbajo(esqueleto);
             }
+            if (this.repeticiones == 4)
+            {
+                this.FeedbackTexBlock.Text = "\t Se acabo el ejercicio";
+                this.fase = 4;
 
+            }
         }
 
         /// <summary>
@@ -431,7 +453,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             {
                 return;
             }
-
+            
             // Don't draw if both points are inferred
             if (joint0.TrackingState == JointTrackingState.Inferred &&
                 joint1.TrackingState == JointTrackingState.Inferred)
@@ -448,7 +470,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
             drawingContext.DrawLine(drawPen, this.SkeletonPointToScreen(joint0.Position), this.SkeletonPointToScreen(joint1.Position));
         }
-
+        
         /// <summary>
         /// Metodo que comprueba si los brazos estan en cruz
         /// </summary>
@@ -471,17 +493,17 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                 this.fase = 1;
                 enPosicion = true;
                 this.FeedbackTexBlock.Text = "\tBien hecho. Ahora el siguiente movimiento";
-                this.FeedbackTexBlock.Text = "\t ponga las manos en la cabeza";
+                this.FeedbackTexBlock.Text = "\t Ponga las manos en la cabeza";
             }
             else
             {
                 fase = 0;
                 enPosicion = false;
-
+             
             }
             return enPosicion;
         }
-
+            
         /// <summary>
         /// Metodo que comprueba si las manos estan en la cabeza. Para eso comprueba la 
         /// distancia de ambas manos entre la cabeza.
@@ -490,24 +512,24 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         /// <returns></returns>
         public bool HandsOnHead(Skeleton esqueleto)
         {
-            this.FeedbackTexBlock.Text = "\t ponga las manos en la cabeza";
+            this.FeedbackTexBlock.Text = "\t Ponga las manos en la cabeza";
             Joint manoDr = esqueleto.Joints[JointType.HandRight];
             Joint manoIq = esqueleto.Joints[JointType.HandLeft];
             Joint cab = esqueleto.Joints[JointType.Head];
             bool enPosicion = false;
             float distanceIq = (manoIq.Position.X - cab.Position.X) + (manoIq.Position.Y - cab.Position.Y) + (manoIq.Position.Z - cab.Position.Z);
             float distanceDr = (manoDr.Position.X - cab.Position.X) + (manoDr.Position.Y - cab.Position.Y) + (manoDr.Position.Z - cab.Position.Z);
-
+            
             // dependiendo de la distancia el resultado sera true o false.
             if (Math.Abs(distanceIq) < 0.2f && Math.Abs(distanceDr) < this.tolerancia /*0.2f*/)
             {
-
-                enPosicion = true;
+                
+                enPosicion= true ;
                 this.fase = 2;
             }
             else
             {
-                this.FeedbackTexBlock.Text = "\t no tiene las manos en la cabeza. Intentelo de nuevo.";
+                this.FeedbackTexBlock.Text = "\t No tiene las manos en la cabeza.";
                 enPosicion = false;
                 this.fase = 1;
             }
@@ -522,7 +544,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         public bool manoAbajo(Skeleton esqueleto)
         {
 
-            this.FeedbackTexBlock.Text = "\t coloque las manos hacia abajo";
+            this.FeedbackTexBlock.Text = "\t Coloque las manos hacia abajo";
             Joint ShoulderI = esqueleto.Joints[JointType.ShoulderLeft];
             Joint ElBowI = esqueleto.Joints[JointType.ElbowLeft];
             Joint WristI = esqueleto.Joints[JointType.WristLeft];
@@ -530,22 +552,183 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             Joint ElBowD = esqueleto.Joints[JointType.ElbowRight];
             Joint WristD = esqueleto.Joints[JointType.WristRight];
             bool enPosicion = false;
-
+            
             // comprobamos que las manos estan mirando hacia abajo.
             if (Math.Abs(ShoulderD.Position.X - WristD.Position.X) < this.tolerancia/*0.1f*/ && Math.Abs(ShoulderD.Position.X - WristD.Position.X) > 0 && Math.Abs(ShoulderD.Position.X - ElBowD.Position.X) < this.tolerancia/*0.1f*/ && Math.Abs(ShoulderD.Position.X - ElBowD.Position.X) > 0)
             {
-                this.FeedbackTexBlock.Text = "\t Bien hecho . Ha terminado el ejercicio ";
+                this.FeedbackTexBlock.Text = "\t Bien hecho . ";
                 enPosicion = true;
+                this.repeticiones++;
+                this.FeedbackRepes.Text = " "+this.repeticiones;
                 this.fase = 0;
+            
             }
             else
-            {
-                this.FeedbackTexBlock.Text = "\t Mal. Baje las manos.";
+            {    
+                this.FeedbackTexBlock.Text="\t Mal. Baje las manos.";
                 enPosicion = false;
                 this.fase = 2;
             }
             return enPosicion;
         }
+        
 
+        
+
+        public void dibujarAyuda(Skeleton esqueleto, DrawingContext drawingContext)
+        {
+
+            // si es 0 llamamos a pintaCruz
+            if (this.fase == 0)
+            {
+                pintaCruz(esqueleto, drawingContext);
+
+            }
+            // Si es 1 llamamos a pintaCabeza
+            else if (this.fase == 1)
+            {
+                pintaCabeza(esqueleto, drawingContext);
+
+            }
+            // Si es dos llamamos a pinta abajo.
+            else if (this.fase == 2)
+            {
+                pintaAbajo(esqueleto, drawingContext);
+
+            }
+
+        }
+
+        
+        public float distanciaEuclidea(Joint p, Joint q)
+        {
+            // extraccion de poscion (X,Y,Z) de cada Joint
+            double pX = p.Position.X;
+            double pY = p.Position.Y;
+            double pZ = p.Position.Z;
+            double qX = q.Position.X;
+            double qY = q.Position.Y;
+            double qZ = q.Position.Z;
+            // Devuelve la distancia euclidea entre los dos puntos
+
+            return (float)Math.Sqrt(Math.Pow(qX - pX, 2) + Math.Pow(qY - pY, 2) + Math.Pow(qZ - pZ, 2));
+        }
+
+        private void pintaCruz(Skeleton esqueleto, DrawingContext drawingContext)
+        {
+            //Puntos que indican donde se deben situar las manos y los codos.
+
+            SkeletonPoint manoDerecha = new SkeletonPoint();
+            SkeletonPoint manoDerecha1 = new SkeletonPoint();
+            SkeletonPoint manoIzquierda = new SkeletonPoint();
+            SkeletonPoint manoIzquierda1 = new SkeletonPoint();
+
+            // X sera la distancia euclidea entre la muñeca y el hombro,
+            // en el primer caso y el codo y el hombro en el segundo :
+            manoDerecha.X = esqueleto.Joints[JointType.ShoulderLeft].Position.X - distanciaEuclidea(esqueleto.Joints[JointType.WristLeft], esqueleto.Joints[JointType.ShoulderLeft]);
+            manoDerecha.Y = esqueleto.Joints[JointType.ShoulderLeft].Position.Y;
+            manoDerecha.Z = esqueleto.Joints[JointType.ShoulderLeft].Position.Z;
+
+            manoDerecha1.X = esqueleto.Joints[JointType.ShoulderLeft].Position.X - distanciaEuclidea(esqueleto.Joints[JointType.ElbowLeft], esqueleto.Joints[JointType.ShoulderLeft]);
+            manoDerecha1.Y = esqueleto.Joints[JointType.ShoulderLeft].Position.Y;
+            manoDerecha1.Z = esqueleto.Joints[JointType.ShoulderLeft].Position.Z;
+
+
+            //La X sera la distancia euclidea entre la muñeca y el hombro,
+            // en el primer caso y el codo y el hombro en el segundo 
+            manoIzquierda.X = esqueleto.Joints[JointType.ShoulderRight].Position.X + distanciaEuclidea(esqueleto.Joints[JointType.WristRight], esqueleto.Joints[JointType.ShoulderRight]);
+            manoIzquierda.Y = esqueleto.Joints[JointType.ShoulderRight].Position.Y;
+            manoIzquierda.Z = esqueleto.Joints[JointType.ShoulderRight].Position.Z;
+
+            manoIzquierda1.X =  esqueleto.Joints[JointType.ShoulderRight].Position.X  + distanciaEuclidea(esqueleto.Joints[JointType.ElbowRight], esqueleto.Joints[JointType.ShoulderRight]);
+            manoIzquierda1.Y = esqueleto.Joints[JointType.ShoulderRight].Position.Y;
+            manoIzquierda1.Z = esqueleto.Joints[JointType.ShoulderRight].Position.Z;
+
+            Point pos1 = this.SkeletonPointToScreen(manoDerecha);
+            drawingContext.DrawEllipse(inferredJointBrush, null, pos1, 10, 10);
+            Point pos2 = this.SkeletonPointToScreen(manoDerecha1);
+            drawingContext.DrawEllipse(inferredJointBrush, null, pos2, 10, 10);
+            Point pos3 = this.SkeletonPointToScreen(manoIzquierda);
+            drawingContext.DrawEllipse(inferredJointBrush, null, pos3, 10, 10);
+            Point pos4 = this.SkeletonPointToScreen(manoIzquierda1);
+            drawingContext.DrawEllipse(inferredJointBrush, null, pos4, 10, 10);
+        }
+
+        private void pintaCabeza(Skeleton esqueleto, DrawingContext drawingContext)
+        {
+
+
+            SkeletonPoint manoDerecha = new SkeletonPoint();
+            SkeletonPoint manoDerecha1 = new SkeletonPoint();
+            SkeletonPoint manoIzquierda = new SkeletonPoint();
+            SkeletonPoint manoIzquierda1 = new SkeletonPoint();
+
+
+            manoDerecha.X = esqueleto.Joints[JointType.Head].Position.X - 0.3f;
+            manoDerecha.Y = esqueleto.Joints[JointType.Head].Position.Y;
+            manoDerecha.Z = esqueleto.Joints[JointType.Head].Position.Z;
+
+
+            manoDerecha1.X = esqueleto.Joints[JointType.ShoulderLeft].Position.X - distanciaEuclidea(esqueleto.Joints[JointType.ElbowLeft], esqueleto.Joints[JointType.ShoulderLeft]);
+            manoDerecha1.Y = esqueleto.Joints[JointType.ShoulderLeft].Position.Y;
+            manoDerecha1.Z = esqueleto.Joints[JointType.ShoulderLeft].Position.Z;
+
+            manoIzquierda.X =esqueleto.Joints[JointType.Head].Position.X + 0.3f;
+            manoIzquierda.Y = esqueleto.Joints[JointType.Head].Position.Y;
+            manoIzquierda.Z = esqueleto.Joints[JointType.Head].Position.Z;
+
+
+            manoIzquierda1.X = esqueleto.Joints[JointType.ShoulderRight].Position.X + distanciaEuclidea(esqueleto.Joints[JointType.ElbowRight], esqueleto.Joints[JointType.ShoulderRight]);
+            manoIzquierda1.Y = esqueleto.Joints[JointType.ShoulderRight].Position.Y;
+            manoIzquierda1.Z = esqueleto.Joints[JointType.ShoulderRight].Position.Z;
+
+            Point pos1 = this.SkeletonPointToScreen(manoDerecha);
+            drawingContext.DrawEllipse(inferredJointBrush, null, pos1, 10, 10);
+            Point pos2 = this.SkeletonPointToScreen(manoDerecha1);
+            drawingContext.DrawEllipse(inferredJointBrush, null, pos2, 10, 10);
+            Point pos3 = this.SkeletonPointToScreen(manoIzquierda);
+            drawingContext.DrawEllipse(inferredJointBrush, null, pos3, 10, 10);
+            Point pos4 = this.SkeletonPointToScreen(manoIzquierda1);
+            drawingContext.DrawEllipse(inferredJointBrush, null, pos4, 10, 10);
+
+        }
+
+        private void pintaAbajo(Skeleton esqueleto, DrawingContext drawingContext)
+        {
+
+            SkeletonPoint manoDerecha = new SkeletonPoint();
+            SkeletonPoint manoDerecha1 = new SkeletonPoint();
+            SkeletonPoint manoIzquierda = new SkeletonPoint();
+            SkeletonPoint manoIzquierda1 = new SkeletonPoint();
+            //La X sera la distancia euclidea entre la muñeca y el hombro,
+            // en el primer caso y el codo y el hombro en el segundo 
+            manoDerecha.X = esqueleto.Joints[JointType.ShoulderLeft].Position.X;
+            manoDerecha.Y = esqueleto.Joints[JointType.ShoulderLeft].Position.Y - distanciaEuclidea(esqueleto.Joints[JointType.WristLeft], esqueleto.Joints[JointType.ShoulderLeft]);
+            manoDerecha.Z = esqueleto.Joints[JointType.ShoulderLeft].Position.Z;
+
+            manoDerecha1.X = esqueleto.Joints[JointType.ShoulderLeft].Position.X;
+            manoDerecha1.Y = esqueleto.Joints[JointType.ShoulderLeft].Position.Y - distanciaEuclidea(esqueleto.Joints[JointType.ElbowLeft], esqueleto.Joints[JointType.ShoulderLeft]);
+            manoDerecha1.Z = esqueleto.Joints[JointType.ShoulderLeft].Position.Z;
+
+            manoIzquierda.X = esqueleto.Joints[JointType.ShoulderRight].Position.X;
+            manoIzquierda.Y = esqueleto.Joints[JointType.ShoulderRight].Position.Y - distanciaEuclidea(esqueleto.Joints[JointType.WristRight], esqueleto.Joints[JointType.ShoulderRight]);
+            manoIzquierda.Z = esqueleto.Joints[JointType.ShoulderRight].Position.Z;
+
+            manoIzquierda1.X = esqueleto.Joints[JointType.ShoulderRight].Position.X;
+            manoIzquierda1.Y = esqueleto.Joints[JointType.ShoulderRight].Position.Y - distanciaEuclidea(esqueleto.Joints[JointType.ElbowRight], esqueleto.Joints[JointType.ShoulderRight]);
+            manoIzquierda1.Z = esqueleto.Joints[JointType.ShoulderRight].Position.Z;
+
+
+            Point pos1 = this.SkeletonPointToScreen(manoDerecha);
+            drawingContext.DrawEllipse(inferredJointBrush, null, pos1, 10, 10);
+            Point pos2 = this.SkeletonPointToScreen(manoDerecha1);
+            drawingContext.DrawEllipse(inferredJointBrush, null, pos2, 10, 10);
+            Point pos3 = this.SkeletonPointToScreen(manoIzquierda);
+            drawingContext.DrawEllipse(inferredJointBrush, null, pos3, 10, 10);
+            Point pos4 = this.SkeletonPointToScreen(manoIzquierda1);
+            drawingContext.DrawEllipse(inferredJointBrush, null, pos4, 10, 10);
+
+            }
+        
     }
 }
