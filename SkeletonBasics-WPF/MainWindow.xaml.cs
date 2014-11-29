@@ -349,7 +349,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             this.DrawBone(skeleton, drawingContext, JointType.AnkleRight, JointType.FootRight);
 
             // comprueba los movimientos y dibuja la ayuda 
-            // LA ayuda no me funciona y no ha sido probada.
+
             dibujarAyuda(skeleton,drawingContext);
 
             CompruebaMovimientos(skeleton);
